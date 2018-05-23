@@ -57,9 +57,10 @@ class Schedule extends View {
     private float standardWidth;
     private float standardHeight;
 
-
     private Block[][] blocks;
     private Block clickBlock;
+
+    private CanvasParameter parameter = null;
 
     private OnItemClickListener onItemClickListener;
     private OnItemLongClickListener onItemLongClickListener;
@@ -141,6 +142,7 @@ class Schedule extends View {
         blocks[x][y].addData(c.getClassName(), c.getClassroom(), c.getTeacher());
         invalidate();
     }
+
     //获取即将要delete的block，用以启动动画
     public BlockState deleteClassBlock(int x, int y) {
         BlockState bs = getTotalBlock(blocks[x][y], block_y);
@@ -274,51 +276,28 @@ class Schedule extends View {
     @Override
     protected void onDraw(Canvas canvas) {
 //        super.onDraw(canvas);
-        float cx = getWidth();
-        float cy = getHeight();
 
-        /**
-         * 侧边栏距离
-         * 顶部距离
-         */
-        float titleInterval_x;
-        float titleInterval_y;
-
-        if (isShowSidebar) {
-            titleInterval_x = cx / 20;
-        } else {
-            titleInterval_x = 0;
+        if (parameter == null) {
+            parameter = new CanvasParameter();
         }
-
-        if (isShowDayBar) {
-            titleInterval_y = cy / 10;
-        } else {
-            titleInterval_y = 0;
-        }
-
-        /**
-         * x轴增加的宽度
-         * y轴增加的宽度
-         */
-        float interval_x = (cx - titleInterval_x) / blocks.length;
-        float interval_y = (cy - titleInterval_y) / blocks[0].length;
 
         //填充ClassBlock
         if (!isClassBlockAssignment) {
+            float x = parameter.getTitleInterval_x();
             for (int i = 0; i < blocks.length; i++) {
-                float x = titleInterval_x + interval_x * i;
+                float y = parameter.getTitleInterval_y();
                 for (int j = 0; j < blocks[i].length; j++) {
-                    float y = titleInterval_y + interval_y * j;
-                    blocks[i][j] = new Block(x, y, interval_x, interval_y);
+                    blocks[i][j] = new Block(x, y, parameter.getInterval_x(), parameter.getInterval_y());
+                    y = y + parameter.getInterval_y();
 //                    Log.d("Block",String.valueOf(x) + " " + String.valueOf(y));
                 }
+                x = x + parameter.getInterval_x();
             }
 //            debug();
             isClassBlockAssignment = true;
         }
 
-        drawLines(canvas, cx, cy, titleInterval_x, titleInterval_y, interval_x, interval_y);
-
+        drawLines(canvas, parameter.getCx(), parameter.getCy(), parameter.getTitleInterval_x(), parameter.getTitleInterval_y(), parameter.getInterval_x(), parameter.getInterval_y());
 
         drawClassBlocks(canvas);
 
@@ -326,6 +305,56 @@ class Schedule extends View {
             drawBlockEdge(canvas);
         }
 
+    }
+
+    private class CanvasParameter {
+        private float cx;
+        private float cy;
+        /**
+         * 侧边栏距离
+         * 顶部距离
+         */
+        private float titleInterval_x;
+        private float titleInterval_y;
+        /**
+         * x轴增加的宽度
+         * y轴增加的宽度
+         */
+        private float interval_x;
+        private float interval_y;
+
+        public CanvasParameter() {
+            cx = getWidth();
+            cy = getHeight();
+            titleInterval_x = (isShowSidebar) ? cx / 20 : 0;
+            titleInterval_y = (isShowDayBar) ? cy / 10 : 0;
+            interval_x = (cx - titleInterval_x) / row;
+            interval_y = (cy - titleInterval_y) / column;
+        }
+
+        public float getCx() {
+            return cx;
+        }
+
+        public float getCy() {
+            return cy;
+        }
+
+        public float getTitleInterval_x() {
+            return titleInterval_x;
+        }
+
+        public float getTitleInterval_y() {
+            return titleInterval_y;
+        }
+
+        public float getInterval_x() {
+            return interval_x;
+        }
+
+        public float getInterval_y() {
+            return interval_y;
+        }
     }
 
     private void drawLines(Canvas canvas, float cx, float cy, float titleInterval_x, float titleInterval_y, float interval_x, float interval_y) {
