@@ -381,7 +381,7 @@ public class ClassSchedule extends FrameLayout {
 
     private void setDetailsDialog(Schedule.Block c, int x, int y) {
         detailsDialog = new DetailsDialog(context);
-        deleteDialog.setTextColor(textColor);
+        detailsDialog.setTextColor(textColor);
 
         if (shadowWidth < 0) {
             shadowWidth = dpToPx(5);
