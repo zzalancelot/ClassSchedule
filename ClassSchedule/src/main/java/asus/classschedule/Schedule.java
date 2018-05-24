@@ -11,7 +11,6 @@ import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -536,12 +535,12 @@ class Schedule extends View {
                 }
                 lastX = x;
                 lastY = y;
-                Log.d("TouchEvent", "Down");
+//                Log.d("TouchEvent", "Down");
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (getClickBlock(lastX, lastY) != c) {
                     actionMove();
-                    Log.d("TouchEvent", "Move");
+//                    Log.d("TouchEvent", "Move");
                     lastX = x;
                     lastY = y;
 //                    return true;
@@ -550,7 +549,7 @@ class Schedule extends View {
                 lastY = y;
             case MotionEvent.ACTION_UP:
                 actionUp();
-                Log.d("TouchEvent", "Up");
+//                Log.d("TouchEvent", "Up");
                 break;
         }
         return true;
@@ -592,7 +591,7 @@ class Schedule extends View {
                     bottomBlock = i;
                 }
             }
-            Log.d("ItemClick", String.valueOf(topBlock) + "   " + String.valueOf(bottomBlock));
+//            Log.d("ItemClick", String.valueOf(topBlock) + "   " + String.valueOf(bottomBlock));
         }
         float height = 0;
         if (topBlock != bottomBlock) {
@@ -634,20 +633,19 @@ class Schedule extends View {
                 @Override
                 public void run() {
                     if (!isMoved && block_x >= 0 && block_y >= 0 && c != null) {
-                        Log.d("TouchEvent", String.valueOf(lastUpSysTime - downSysTime >= longClickJudgeClock));
                         if (lastUpSysTime == 0 || Math.abs(lastUpSysTime - downSysTime) > longClickJudgeClock) {
                             onItemLongClickListener.onLongClick(c, block_x, block_y);
-                            Log.w("TouchEvent", "longClick");
+//                            Log.w("TouchEvent", "longClick");
                         } else {
                             if (clickTimes > 1) {
                                 if (onItemDoubleClickListener != null && c != null) {
                                     onItemDoubleClickListener.onDoubleClick(c, block_x, block_y);
-                                    Log.w("TouchEvent", "doubleClick");
+//                                    Log.w("TouchEvent", "doubleClick");
                                 }
                             } else {
                                 if (onItemClickListener != null && c != null) {
                                     onItemClickListener.onClick(c, block_x, block_y);
-                                    Log.w("TouchEvent", "click");
+//                                    Log.w("TouchEvent", "click");
                                 }
                             }
                         }
