@@ -1,6 +1,8 @@
 package asus.classschedule;
 
+import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Handler;
@@ -23,7 +25,8 @@ public class ClassSchedule extends FrameLayout {
      * 动画变量
      */
     //动画持续时间
-    private int animSpeed = 25;
+    private int showAnimSpeed = 25;
+    private int hideAnimSpeed = 1000;
 
     private int marginLeft;
     private int marginRight;
@@ -66,6 +69,7 @@ public class ClassSchedule extends FrameLayout {
 
     private boolean dialogIsShow = false;
     private boolean showDetailsDialog = true;
+    private boolean hasExplosionField = false;
 
     private RelativeLayout.LayoutParams detailsDialogParams;
     private RelativeLayout.LayoutParams deleteDialogParams;
@@ -119,13 +123,14 @@ public class ClassSchedule extends FrameLayout {
                 LayoutParams.MATCH_PARENT,
                 LayoutParams.MATCH_PARENT
         );
-        this.addView(schedule,params);
-        this.addView(relativeLayout,params);
+        this.addView(schedule, params);
+        this.addView(relativeLayout, params);
     }
 
     //因为粒子动画需要传入activity，所以在这里传入activity
     public void setActivity(Activity activity) {
         explosionField = ExplosionField.attach2Window(activity);
+        hasExplosionField = true;
     }
 
     public void setRowsAndColumns(int row, int column) {
@@ -141,8 +146,8 @@ public class ClassSchedule extends FrameLayout {
         this.shadowWidth = shadowWidth;
     }
 
-    public void setAnimSpeed(int animSpeed) {
-        this.animSpeed = animSpeed;
+    public void setShowAnimSpeed(int showAnimSpeed) {
+        this.showAnimSpeed = showAnimSpeed;
     }
 
     public void showDayBar(boolean isShowDayBar) {
@@ -152,6 +157,7 @@ public class ClassSchedule extends FrameLayout {
     public void showSideBar(boolean isShowSideBar) {
         schedule.showSideBar(isShowSideBar);
     }
+
     //设置显示课程名还是教室，true为显示课程名，false为显示教室
     public void showClassName(boolean showClassName) {
         schedule.setShowClassName(showClassName);
@@ -165,7 +171,7 @@ public class ClassSchedule extends FrameLayout {
      * set方法：如果原Block有数据，将对原有数据进行覆盖
      * add方法：如果原Block有数据，将会把add的数据拼接在原数据后，以"，"连接
      */
-    public void setTextColor(int textColor){
+    public void setTextColor(int textColor) {
         schedule.setTextColor(this.textColor);
         schedule.invalidate();
     }
@@ -251,8 +257,10 @@ public class ClassSchedule extends FrameLayout {
                     h.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            if (explosionField != null) {
+                            if (explosionField != null && hasExplosionField) {
                                 explosionField.explode(deleteDialog);
+                            } else {
+                                hideDialog(deleteDialog);
                             }
                             final Handler handler = new Handler();
                             handler.postDelayed(new Runnable() {
@@ -321,19 +329,23 @@ public class ClassSchedule extends FrameLayout {
                         }
                     }
                     if (dialogIsShow) {
-                        if (explosionField != null && detailsDialog != null && detailsDialog.getWidth() > 0 && detailsDialog.getHeight() > 0) {
-                            explosionField.explode(detailsDialog);
-                        } else {
-                            explosionField = new ExplosionField(context);
-                            if (detailsDialog != null && detailsDialog.getWidth() > 0 && detailsDialog.getHeight() > 0) {
+                        if (hasExplosionField) {
+                            if (explosionField != null && detailsDialog != null && detailsDialog.getWidth() > 0 && detailsDialog.getHeight() > 0) {
                                 explosionField.explode(detailsDialog);
                             } else {
-                                if (detailsDialog == null) {
-                                    Log.w("ClassSchedule", "detailsDialog is null");
+                                explosionField = new ExplosionField(context);
+                                if (detailsDialog != null && detailsDialog.getWidth() > 0 && detailsDialog.getHeight() > 0) {
+                                    explosionField.explode(detailsDialog);
                                 } else {
-                                    Log.w("ClassSchedule", "The value of detailsDialog's width or height is 0");
+                                    if (detailsDialog == null) {
+                                        Log.w("ClassSchedule", "detailsDialog is null");
+                                    } else {
+                                        Log.w("ClassSchedule", "The value of detailsDialog's width or height is 0");
+                                    }
                                 }
                             }
+                        } else {
+                            hideDialog(detailsDialog);
                         }
                         final Handler handler = new Handler();
                         handler.postDelayed(new Runnable() {
@@ -393,8 +405,8 @@ public class ClassSchedule extends FrameLayout {
                 (int) (getWidth() - c.getRight()),
                 (int) (getHeight() - c.getBottom()));
 
-        getMargins(c, x, y);
-        marginsAnim();
+        getShowDialogMargins(c, x, y);
+        showDialogMarginsAnim();
 
         relativeLayout.addView(detailsDialog, detailsDialogParams);
         if (detailsDialog != null) {
@@ -415,9 +427,9 @@ public class ClassSchedule extends FrameLayout {
     }
 
     //TODO:计算DetailsDialog中文字的具体height，来判断是否需要再增加DetailsDialog的高度
-    private void getMargins(Schedule.Block c, int x, int y) {
+    private void getShowDialogMargins(Schedule.Block c, int x, int y) {
 //        this.c = c;
-//        changeShadow = shadowWidth / animSpeed / 3;
+//        changeShadow = shadowWidth / showAnimSpeed / 3;
         marginLeft = (int) (c.getLeft() - shadowWidth);
         marginRight = (int) (getWidth() - c.getRight() - shadowWidth);
         marginTop = (int) (c.getTop() - shadowWidth);
@@ -428,26 +440,26 @@ public class ClassSchedule extends FrameLayout {
          */
         if (x == 0) {
             targetMarginLeft = marginLeft;
-            changeMarginLeft = shadowWidth / animSpeed;
+            changeMarginLeft = shadowWidth / showAnimSpeed;
 
             targetMarginRight = getWidth() - (int) (c.getRight() + schedule.getStandardWidth() * 2 + shadowWidth);
-            changeMarginRight = (marginRight - targetMarginRight) / animSpeed;
+            changeMarginRight = (marginRight - targetMarginRight) / showAnimSpeed;
 
             widthMode = 1;
         } else if (x == row - 1) {
             targetMarginLeft = (int) (c.getLeft() - schedule.getStandardWidth() * 2 - shadowWidth);
-            changeMarginLeft = (marginLeft - targetMarginLeft) / animSpeed;
+            changeMarginLeft = (marginLeft - targetMarginLeft) / showAnimSpeed;
 
             targetMarginRight = marginRight;
-            changeMarginRight = shadowWidth / animSpeed;
+            changeMarginRight = shadowWidth / showAnimSpeed;
 
             widthMode = 3;
         } else {
             targetMarginLeft = (int) (c.getLeft() - schedule.getStandardWidth() - shadowWidth);
-            changeMarginLeft = (marginLeft - targetMarginLeft) / animSpeed;
+            changeMarginLeft = (marginLeft - targetMarginLeft) / showAnimSpeed;
 
             targetMarginRight = (int) (getWidth() - c.getRight() - schedule.getStandardWidth() - shadowWidth);
-            changeMarginRight = (marginRight - targetMarginRight) / animSpeed;
+            changeMarginRight = (marginRight - targetMarginRight) / showAnimSpeed;
 //            changeMarginWidth *= 2;
             widthMode = 2;
         }
@@ -458,7 +470,7 @@ public class ClassSchedule extends FrameLayout {
             switch (blocks) {
                 case 1:
                     targetMarginTop = marginTop - (int) (schedule.getStandardHeight());
-                    changeMarginTop = schedule.getStandardHeight() / animSpeed * 2;
+                    changeMarginTop = schedule.getStandardHeight() / showAnimSpeed * 2;
                     break;
                 case 2:
                     targetMarginTop = marginTop;
@@ -466,19 +478,19 @@ public class ClassSchedule extends FrameLayout {
                     break;
                 default:
                     targetMarginTop = getHeight() - (int) (schedule.getStandardHeight() * 2 + shadowWidth);
-                    changeMarginTop = (targetMarginTop - marginTop) / animSpeed * 1.5f;
+                    changeMarginTop = (targetMarginTop - marginTop) / showAnimSpeed * 1.5f;
                     break;
             }
             targetMarginBottom = marginBottom;
-            changeMarginBottom = shadowWidth / animSpeed;
+            changeMarginBottom = shadowWidth / showAnimSpeed;
             heightMode = false;
         } else {
             targetMarginTop = marginTop;
-            changeMarginTop = shadowWidth / animSpeed;
+            changeMarginTop = shadowWidth / showAnimSpeed;
             switch (blocks) {
                 case 1:
                     targetMarginBottom = marginBottom - (int) (schedule.getStandardHeight());
-                    changeMarginBottom = (int) ((marginBottom - targetMarginBottom) / animSpeed * 1.5);
+                    changeMarginBottom = (int) ((marginBottom - targetMarginBottom) / showAnimSpeed * 1.5);
                     break;
                 case 2:
                     targetMarginBottom = marginBottom;
@@ -486,7 +498,7 @@ public class ClassSchedule extends FrameLayout {
                     break;
                 default:
                     targetMarginBottom = marginBottom + (int) (schedule.getStandardHeight() * (blocks - 2));
-                    changeMarginBottom = (targetMarginBottom - marginBottom) / animSpeed * 1.5f;
+                    changeMarginBottom = (targetMarginBottom - marginBottom) / showAnimSpeed * 1.5f;
                     break;
             }
             heightMode = true;
@@ -497,13 +509,28 @@ public class ClassSchedule extends FrameLayout {
         if (targetElevation < 0) {
             targetElevation = 20;
         }
-        changeElevation = targetElevation / animSpeed;
+        changeElevation = targetElevation / showAnimSpeed;
+    }
+
+    private void hideDialog(final asus.classschedule.Dialog dialog) {
+        ValueAnimator anim = ValueAnimator.ofFloat(1.0f, 0.0f);
+        anim.setDuration(hideAnimSpeed);
+        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float value = (float) animation.getAnimatedValue();
+                Log.w("value",String.valueOf(value));
+                dialog.setAlpha(value);
+            }
+        });
+        anim.start();
     }
 
     //启动动画
-    private void marginsAnim() {
+    private void showDialogMarginsAnim() {
         marginHandler = new Handler();
         if (detailsDialog != null) {
+//            dialogIsShow = true;
             marginHandler.postDelayed(runnable, 10);
         }
         final Handler handler = new Handler();
@@ -514,7 +541,7 @@ public class ClassSchedule extends FrameLayout {
 //                marginHandler.removeCallbacks(runnable);
                 handler.removeCallbacks(this);
             }
-        }, animSpeed);
+        }, showAnimSpeed);
 
     }
 

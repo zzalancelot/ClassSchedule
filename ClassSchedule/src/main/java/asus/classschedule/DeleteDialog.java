@@ -10,9 +10,7 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.view.View;
 
-class DeleteDialog extends View {
-
-    private int textColor = Color.BLACK;
+class DeleteDialog extends Dialog {
 
     private Context context;
 
@@ -30,11 +28,7 @@ class DeleteDialog extends View {
         init();
     }
 
-    public void setTextColor(int textColor){
-        this.textColor = textColor;
-    }
-
-    public void setBlock(Schedule.Block block){
+    public void setBlock(Schedule.Block block) {
         this.block = block;
     }
 
@@ -45,41 +39,41 @@ class DeleteDialog extends View {
         fillPaint.setStyle(Paint.Style.FILL);
 
         textPaint = new TextPaint();
-        textPaint.setColor(textColor);
+        textPaint.setColor(getTextColor());
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-//        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
-        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
-        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
-
-        int width;
-        int height;
-        int mWidth = 0;
-
-        if (widthMode == MeasureSpec.EXACTLY) {
-            width = widthSize;
-        } else {
-            width = mWidth + getPaddingLeft() + getPaddingRight();
-        }
-        if (heightMode == MeasureSpec.EXACTLY) {
-            height = heightSize;
-        } else {
-            height = mWidth + getPaddingTop() + getPaddingBottom();
-        }
-        setMeasuredDimension(width, height);
-    }
+//    @Override
+//    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+////        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+//        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+//        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+//        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+//        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+//
+//        int width;
+//        int height;
+//        int mWidth = 0;
+//
+//        if (widthMode == MeasureSpec.EXACTLY) {
+//            width = widthSize;
+//        } else {
+//            width = mWidth + getPaddingLeft() + getPaddingRight();
+//        }
+//        if (heightMode == MeasureSpec.EXACTLY) {
+//            height = heightSize;
+//        } else {
+//            height = mWidth + getPaddingTop() + getPaddingBottom();
+//        }
+//        setMeasuredDimension(width, height);
+//    }
 
     @Override
     protected void onDraw(Canvas canvas) {
 //        super.onDraw(canvas);
         RectF rectF = new RectF(0, 0, getWidth(), getHeight());
         fillPaint.setColor(block.getBlockColor());
-        canvas.drawRoundRect(rectF,20,20,fillPaint);
-        drawText(canvas,block);
+        canvas.drawRoundRect(rectF, 20, 20, fillPaint);
+        drawText(canvas, block);
     }
 
     private void drawText(Canvas canvas, Schedule.Block Block) {
@@ -108,9 +102,9 @@ class DeleteDialog extends View {
 
         textPaint.setTextSize(textSize);
 
-        float start_x = Block.getLeft() ;
+//        float start_x = Block.getLeft() ;
 //                + dpToPx(1.5f);
-        float start_y = Block.getTop() ;
+//        float start_y = Block.getTop() ;
 //                + dpToPx(3);
 //                (Block.getHeight() / 2) - (float) (Math.floor(columnText / 2) * textSize);
 
@@ -141,9 +135,5 @@ class DeleteDialog extends View {
 //        canvas.translate(-start_x, -start_y);
     }
 
-    private float dpToPx(float dpValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (dpValue * scale + 0.5f);
-    }
 
 }

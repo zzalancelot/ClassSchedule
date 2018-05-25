@@ -16,11 +16,9 @@ import android.view.View;
 
 import java.util.ArrayList;
 
-class DetailsDialog extends View {
+class DetailsDialog extends Dialog {
 
     private Context context;
-
-    private int textColor = Color.BLACK;
 
     private float shadowWidth;
 
@@ -54,13 +52,9 @@ class DetailsDialog extends View {
         fillPaint.setStyle(Paint.Style.FILL);
 
         textPaint = new TextPaint();
-        textPaint.setColor(textColor);
+        textPaint.setColor(getTextColor());
 
         shadowWidth = dpToPx(5);
-    }
-
-    public void setTextColor(int textColor) {
-        this.textColor = textColor;
     }
 
     public void setClassBlock(Schedule.Block classBlock) {
@@ -84,34 +78,34 @@ class DetailsDialog extends View {
 //        System.gc();
 //    }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-//        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
-        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
-        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
-        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
-
-        int width;
-        int height;
-        int mWidth = 0;
-
-        if (widthMode == MeasureSpec.EXACTLY) {
-            width = widthSize;
-        } else {
-            width = mWidth + getPaddingLeft() + getPaddingRight();
-        }
-        if (heightMode == MeasureSpec.EXACTLY) {
-            height = heightSize;
-        } else {
-            height = mWidth + getPaddingTop() + getPaddingBottom();
-        }
-//        if (width > height) {
-//            width = height;
+//    @Override
+//    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+////        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+//
+//        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+//        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+//        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+//        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+//
+//        int width;
+//        int height;
+//        int mWidth = 0;
+//
+//        if (widthMode == MeasureSpec.EXACTLY) {
+//            width = widthSize;
+//        } else {
+//            width = mWidth + getPaddingLeft() + getPaddingRight();
 //        }
-        setMeasuredDimension(width, height);
-    }
+//        if (heightMode == MeasureSpec.EXACTLY) {
+//            height = heightSize;
+//        } else {
+//            height = mWidth + getPaddingTop() + getPaddingBottom();
+//        }
+////        if (width > height) {
+////            width = height;
+////        }
+//        setMeasuredDimension(width, height);
+//    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -187,11 +181,6 @@ class DetailsDialog extends View {
             excessHeight += (textHeight > height) ? (int) (Math.ceil(textHeight)) : height;
         }
 
-    }
-
-    private float dpToPx(float dpValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (dpValue * scale + 0.5f);
     }
 
     @Override
