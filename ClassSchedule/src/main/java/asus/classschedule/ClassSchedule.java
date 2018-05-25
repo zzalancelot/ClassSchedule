@@ -2,7 +2,6 @@ package asus.classschedule;
 
 import android.animation.ValueAnimator;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Handler;

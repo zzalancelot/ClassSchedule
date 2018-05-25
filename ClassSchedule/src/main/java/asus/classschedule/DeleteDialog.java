@@ -2,13 +2,11 @@ package asus.classschedule;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
-import android.view.View;
 
 class DeleteDialog extends Dialog {
 
