@@ -14,6 +14,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.Date;
 import java.util.Random;
 
 class Schedule extends View {
@@ -82,6 +83,8 @@ class Schedule extends View {
             "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"
     };
 
+    private Date[] dates;
+
     public Schedule(Context context) {
         super(context);
         this.context = context;
@@ -118,6 +121,8 @@ class Schedule extends View {
         textPaint.setDither(true);
         textPaint.setColor(textColor);
 
+        TimeJudge timeJudge = new TimeJudge();
+        dates = timeJudge.getWeekDay();
     }
 
     public void setTextColor(int textColor) {
@@ -379,7 +384,14 @@ class Schedule extends View {
             canvas.drawLine(interval, 0, interval, cy, linePaint);
             float j = interval + (interval_x - (weekTextSize * 2)) / 2;
             if (isShowDayBar) {
-                canvas.drawText(weeks[i], j, titleInterval_y - (titleInterval_y - weekTextSize) / 2, linePaint);
+                String data = (dates[i].getDate() == 1) ? String.valueOf(dates[i].getMonth() + 1) + "月" : String.valueOf(dates[i].getDate());
+                String week = weeks[i] + "\n" + data;
+                textPaint.setTextSize(weekTextSize);
+                StaticLayout staticLayout = new StaticLayout(week, textPaint, (int) (weekTextSize * 2), Layout.Alignment.ALIGN_CENTER, 1, 0, false);
+                canvas.translate(j, titleInterval_y / 2 - weekTextSize);
+                staticLayout.draw(canvas);
+                canvas.translate(-j, -(titleInterval_y / 2 - weekTextSize));
+//                canvas.drawText(weeks[i], j, titleInterval_y - (titleInterval_y - weekTextSize) / 2, linePaint);
             }
         }
         float classesTextSize = dpToPx(13);
@@ -463,7 +475,7 @@ class Schedule extends View {
         float start_y = Block.top + dpToPx(3);
 //                (Block.getHeight() / 2) - (float) (Math.floor(columnText / 2) * textSize);
 
-        StaticLayout staticLayout = null;
+        StaticLayout staticLayout;
         int textWidth = (int) (Block.getWidth() - (padding_x * 2 - dpToPx(1)));
         if (isEllipsis) {
             staticLayout = new StaticLayout(text, textPaint, textWidth, Layout.Alignment.ALIGN_CENTER, 1, 0, true);
