@@ -9,9 +9,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
+import asus.classschedule.Blocks.ClassBlock;
 import tyrantgit.explosionfield.ExplosionField;
 
 public class ClassSchedule extends FrameLayout {
@@ -518,7 +520,7 @@ public class ClassSchedule extends FrameLayout {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 float value = (float) animation.getAnimatedValue();
-                Log.w("value",String.valueOf(value));
+                Log.w("value", String.valueOf(value));
                 dialog.setAlpha(value);
             }
         });

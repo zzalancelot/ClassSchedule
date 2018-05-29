@@ -11,11 +11,14 @@ import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.Date;
 import java.util.Random;
+
+import asus.classschedule.Blocks.ClassBlock;
 
 class Schedule extends View {
 
@@ -223,19 +226,44 @@ class Schedule extends View {
         int height;
         int mWidth = width_default;
 
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        int displayHeight = metrics.heightPixels;
+
         if (widthMode == MeasureSpec.EXACTLY) {
-            width = widthSize;
+            if (row > 7) {
+                width = (getWidth() / 7) * row;
+            } else {
+                width = widthSize;
+            }
+        } else if (widthMode == MeasureSpec.AT_MOST) {
+            if (row > 7) {
+                width = (getWidth() / 7) * row;
+            } else {
+                width = mWidth + getPaddingLeft() + getPaddingRight();
+            }
         } else {
             width = mWidth + getPaddingLeft() + getPaddingRight();
         }
+
         if (heightMode == MeasureSpec.EXACTLY) {
-            height = heightSize;
+            if (column > 10) {
+                height = (displayHeight / 10) * column;
+            } else {
+                height = heightSize;
+            }
+        } else if (heightMode == MeasureSpec.AT_MOST) {
+            if (column > 10) {
+                height = (getHeight() / 10) * column;
+            } else {
+                height = mWidth + getPaddingTop() + getPaddingBottom();
+            }
         } else {
             height = mWidth + getPaddingTop() + getPaddingBottom();
         }
-        if (width > height) {
-            width = height;
-        }
+//        if (width > height) {
+//            width = height;
+//        }
+
         setMeasuredDimension(width, height);
 
     }
